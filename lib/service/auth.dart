@@ -1,20 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coreh/UI/login.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-ValueNotifier<AuthService> authService = ValueNotifier(AuthService());
 
-class AuthService{
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-  User? get currentUser => firebaseAuth.currentUser;
+class DatabaseService {
+  final _fire = FirebaseFirestore.instance;
 
-  Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
-
-  Future<UserCredential> signIn({
-    required String email,
-    required String password,
-  }) async {
-    return await firebaseAuth.signInWithEmailAndPassword(
-      email: email, password: password);
-}
+  Read (User user) async {
+    final data = await _fire.collection("employees").doc(user.ecode).get();
+    print(data["name"]);
+    print(data);
+    return data;
+  }
 }

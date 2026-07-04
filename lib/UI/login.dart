@@ -1,6 +1,10 @@
 import 'package:coreh/UI/Splash.dart';
 import 'package:coreh/service/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:coreh/UI/Dashboard_A.dart';
+import 'package:coreh/UI/Dashboard_M.dart';
+import 'package:coreh/UI/Dashboard_W.dart';
+
 
 class login extends StatefulWidget {
   @override
@@ -8,15 +12,13 @@ class login extends StatefulWidget {
 
 }
 
-class _login extends State<login>{
+class _login extends State<login> {
+
+  final _dbservice = DatabaseService();
   var email = TextEditingController();
   var pass = TextEditingController();
 
-  void Singin() async{
-    await authService.value.signIn(
-        email: email.text, password: pass.text);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => splashScreen()));
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,13 +35,13 @@ class _login extends State<login>{
               children: [
                 Text("Login", style: TextStyle(fontSize: 30),),
                 SizedBox(height: 20,),
-                Text("Email",style: TextStyle(fontSize: 20),),
+                Text("E Code",style: TextStyle(fontSize: 20),),
                 TextField(
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20)
                     ),
-                    suffixText: "Email id",
+                    hintText: "Employee Code",
                   ),
                   controller: email,
                 ),
@@ -50,18 +52,36 @@ class _login extends State<login>{
                       border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(20)
                       ),
-                      suffixText: "Password",
+                      hintText: "Password",
                   ),
                   controller: pass,
                   obscureText: true,
                   obscuringCharacter: "*",
                 ),
                 SizedBox(height: 20,),
-                ElevatedButton(onPressed: (){
+                ElevatedButton(onPressed: () async {
+
                   String uemail = email.text.toString();
+                  int ecode = int.tryParse(uemail) ?? 0;
+                  if (ecode >= 10300 || ecode < 10001){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> login()));
+                  }
                   String upass = pass.text.toString();
                   print("Email : $uemail \nPass : $upass");
-                  Singin();
+                  final user = User(ecode: email.text, epass: pass.text);
+                  final Udata = await _dbservice.Read(user);
+                  if (Udata["password"] == user.epass){
+                    if (Udata["department"] == "Maintenance"){
+                      Navigator.push(context,MaterialPageRoute(builder: ((context) => Mdash())));
+                    }
+                    else {
+                      Navigator.push(context, MaterialPageRoute(builder: ((context) => Wdash())));
+                    }
+                  }
+                  else{
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => login()));
+                  }
+
                 },
                     child: Text("Submit"),)
               ],
@@ -73,4 +93,12 @@ class _login extends State<login>{
     );
   }
 
+}
+
+
+class User{
+  final String ecode;
+  final String epass;
+
+  User({required this.ecode, required this.epass});
 }
