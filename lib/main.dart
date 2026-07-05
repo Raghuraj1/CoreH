@@ -1,3 +1,4 @@
+import 'package:coreh/UI/Dashboard_W.dart';
 import 'package:coreh/UI/Splash.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: splashScreen(),
+      home: Wdash(),
     );
   }
 }
